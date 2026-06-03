@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <!-- viewport-fit=cover — для корректного safe-area на iPhone -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="format-detection" content="telephone=no">
+  <title>Pro-Marker</title>
+
+  <!-- Telegram Web App SDK — обязательно ДО всех скриптов -->
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+  <link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+
+<div id="app">
+
+  <!-- ════════════════════════════════════════════════════════════
+       ЭКРАН 1: ГЛАВНАЯ
+       ════════════════════════════════════════════════════════════ -->
+  <section class="screen" id="screen-home">
+
+    <div class="home-greeting">
+      <h2 id="greeting-name">Привет! 👋</h2>
+      <p class="subtitle">Найди свой идеальный набор</p>
+    </div>
+
+    <!-- Сезонный баннер — класс summer/autumn/winter/spring проставляется из JS -->
+    <div class="season-banner summer" id="season-banner" onclick="App.goToCatalogSeason()">
+      <span class="banner-emoji" id="banner-emoji">☀️</span>
+      <div class="banner-text">
+        <strong id="banner-title">Летняя коллекция</strong>
+        <span>Эксклюзивные наборы только этим сезоном</span>
+      </div>
+    </div>
+
+    <!-- Две плитки категорий -->
+    <div class="home-categories">
+      <div class="cat-tile" id="tile-h" onclick="App.navigate('catalog', { tab:'highlighters' })">
+        <img src="../photos/IMG_8384.PNG" alt="Текстовыделители" loading="eager">
+        <div class="cat-tile-label">✏️ Текстовыделители</div>
+      </div>
+      <div class="cat-tile" id="tile-s" onclick="App.navigate('catalog', { tab:'stickers' })">
+        <img src="../photos/IMG_8403.PNG" alt="Стикеры-закладки" loading="eager">
+        <div class="cat-tile-label">🔖 Стикеры-закладки</div>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- ════════════════════════════════════════════════════════════
+       ЭКРАН 2: КАТАЛОГ
+       ════════════════════════════════════════════════════════════ -->
+  <section class="screen active" id="screen-catalog">
+
+    <div class="screen-header">
+      <div class="screen-title" id="catalog-title">Маркеры</div>
+    </div>
+
+    <!-- Сетки товаров рендерятся сюда через JS -->
+    <div class="catalog-body" id="catalog-body"></div>
+
+  </section>
+
+  <!-- ════════════════════════════════════════════════════════════
+       ЭКРАН 3: КАРТОЧКА ТОВАРА
+       ════════════════════════════════════════════════════════════ -->
+  <section class="screen" id="screen-product">
+
+    <!-- Большое фото — нажатие открывает fullscreen -->
+    <img class="product-hero" id="product-img" src="" alt="" onclick="App.openPhoto()">
+
+    <div class="product-detail">
+      <!-- Сезонная плашка (скрыта для обычных товаров) -->
+      <div class="season-pill" id="product-season-pill" style="display:none"></div>
+
+      <h1 class="product-name" id="product-name"></h1>
+      <p  class="product-desc" id="product-desc"></p>
+
+      <div class="product-price-row">
+        <div class="product-price" id="product-price"></div>
+
+        <!-- +/− количества -->
+        <div class="qty-wrap">
+          <button class="qty-btn" onclick="App.changeQty(-1)">−</button>
+          <span   class="qty-val" id="qty-val">1</span>
+          <button class="qty-btn" onclick="App.changeQty(+1)">+</button>
+        </div>
+      </div>
+
+      <p class="product-total" id="product-total"></p>
+    </div>
+
+  </section>
+
+  <!-- ════════════════════════════════════════════════════════════
+       ЭКРАН 4: КОРЗИНА
+       ════════════════════════════════════════════════════════════ -->
+  <section class="screen" id="screen-cart">
+
+    <div class="screen-header">
+      <div class="screen-title">Корзина</div>
+    </div>
+
+    <!-- Пустая корзина -->
+    <div class="cart-empty" id="cart-empty">
+      <div class="cart-empty-icon">🛒</div>
+      <h3>Корзина пуста</h3>
+      <p>Добавь что-нибудь из каталога</p>
+      <button class="btn-to-catalog" onclick="App.navigate('catalog',{tab:'highlighters'})">
+        Перейти в каталог
+      </button>
+    </div>
+
+    <!-- Заполненная корзина (скрыта пока пусто) -->
+    <div id="cart-filled" style="display:none">
+      <div class="cart-list" id="cart-list"></div>
+      <div class="cart-footer">
+        <span class="cart-footer-label">Итого</span>
+        <span class="cart-footer-total" id="cart-total"></span>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- ════════════════════════════════════════════════════════════
+       ЭКРАН 5: ОФОРМЛЕНИЕ ЗАКАЗА
+       ════════════════════════════════════════════════════════════ -->
+  <section class="screen" id="screen-checkout">
+
+    <div class="screen-header">
+      <div class="screen-title">Оформление</div>
+    </div>
+
+    <!-- Индикатор прогресса (2 шага) -->
+    <div class="checkout-progress">
+      <div class="progress-step done" id="step-1"></div>
+      <div class="progress-step"      id="step-2"></div>
+    </div>
+
+    <!-- Шаг 1: Доставка -->
+    <div class="checkout-form" id="form-step-1">
+      <div class="field-label">Имя получателя</div>
+      <input class="field-input" id="input-name"    type="text"  placeholder="Как к вам обращаться?"     autocomplete="name"           enterkeyhint="next">
+
+      <div class="field-label">Адрес доставки</div>
+      <input class="field-input" id="input-address" type="text"  placeholder="Город, улица, дом, квартира" autocomplete="street-address" enterkeyhint="next">
+
+      <button class="btn-next" onclick="App.nextStep()">Далее →</button>
+    </div>
+
+    <!-- Шаг 2: Контакт + сводка (скрыт изначально) -->
+    <div class="checkout-form" id="form-step-2" style="display:none">
+      <div class="field-label">Телефон для курьера</div>
+      <input class="field-input" id="input-phone" type="tel" placeholder="+7 (___) ___-__-__" autocomplete="tel" enterkeyhint="done">
+
+      <!-- Сводка заказа рендерится сюда -->
+      <div class="order-summary" id="order-summary"></div>
+    </div>
+
+  </section>
+
+  <!-- ════════════════════════════════════════════════════════════
+       ЭКРАН 6: ПОДТВЕРЖДЕНИЕ ЗАКАЗА
+       ════════════════════════════════════════════════════════════ -->
+  <section class="screen" id="screen-success">
+    <div class="success-wrap">
+
+      <!-- SVG-галочка с анимацией stroke -->
+      <svg class="checkmark-svg" viewBox="0 0 100 100">
+        <circle class="ck-circle" id="ck-circle" cx="50" cy="50" r="45"/>
+        <polyline class="ck-check" id="ck-check" points="26,52 42,68 74,33"/>
+      </svg>
+
+      <h2 class="success-title">Заказ оформлен!</h2>
+      <p class="success-order">Номер заказа: <strong id="order-num">#0000</strong></p>
+      <p class="success-note">Мы напишем тебе в этот чат, как только отправим посылку 📦</p>
+
+      <button class="btn-home" onclick="App.goHome()">Вернуться в магазин</button>
+    </div>
+  </section>
+
+  <!-- ════════════════════════════════════════════════════════════
+       СЛУЖЕБНЫЕ ЭЛЕМЕНТЫ (всегда поверх экранов)
+       ════════════════════════════════════════════════════════════ -->
+
+  <!-- Toast-уведомление -->
+  <div class="toast" id="toast"></div>
+
+  <!-- Fullscreen просмотр фото -->
+  <div class="photo-fullscreen" id="photo-fs">
+    <img id="photo-fs-img" src="" alt="">
+    <button class="photo-fs-close" onclick="App.closePhoto()">✕</button>
+  </div>
+
+  <!-- Плавающая кнопка корзины -->
+  <button class="cart-fab" id="cart-fab" onclick="App.navigate('cart')">
+    <span class="fab-icon">🛒</span>
+    <span class="fab-count" id="fab-count">0</span>
+  </button>
+
+  <!-- Кнопка «Назад» — глобальная, поверх всех экранов -->
+  <button class="app-back-btn" id="app-back-btn" onclick="App.handleBack()">
+    <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
+      <path d="M11 4L6 9L11 14" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  </button>
+
+  <!-- Нижняя навигация -->
+  <nav class="bottom-nav" id="bottom-nav">
+
+    <button class="nav-item" id="nav-markers" onclick="App.navTo('markers')">
+      <span class="nav-icon-wrap">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          <path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4 9.5-9.5z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </span>
+      <span class="nav-label">Маркеры</span>
+    </button>
+
+    <button class="nav-item" id="nav-stickers" onclick="App.navTo('stickers')">
+      <span class="nav-icon-wrap">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2v16z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </span>
+      <span class="nav-label">Стикеры</span>
+    </button>
+
+    <button class="nav-item nav-item--cart" id="nav-cart" onclick="App.navTo('cart')">
+      <span class="nav-icon-wrap">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4H6z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M16 10a4 4 0 01-8 0" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <span class="nav-badge" id="nav-badge">0</span>
+      </span>
+      <span class="nav-label">Корзина</span>
+    </button>
+
+    <button class="nav-item nav-item--bouquet" id="nav-bouquet" onclick="App.navTo('bouquet')">
+      <span class="nav-icon-wrap">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <circle cx="8.5" cy="8.5" r="2.5" stroke="currentColor" stroke-width="1.9"/>
+          <circle cx="15.5" cy="8.5" r="2.5" stroke="currentColor" stroke-width="1.9"/>
+          <circle cx="12"   cy="5.5" r="2.5" stroke="currentColor" stroke-width="1.9"/>
+          <path d="M8.5 11C8.5 14.5 10 17.5 12 19c2-1.5 3.5-4.5 3.5-8" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M12 19v2.5" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/>
+        </svg>
+      </span>
+      <span class="nav-label">Букет</span>
+    </button>
+
+  </nav>
+
+</div><!-- /#app -->
+
+<!-- Порядок важен: config → catalog → cart → app -->
+<script src="js/config.js"></script>
+<script src="js/catalog.js"></script>
+<script src="js/cart.js"></script>
+<script src="js/app.js"></script>
+
+</body>
+</html>

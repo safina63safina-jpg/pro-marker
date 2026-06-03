@@ -1,0 +1,14 @@
+# Секретные данные — никогда не публиковать
+tg-app/js/config.js
+
+# Рабочие файлы
+brief.md
+research.md
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editors
+.vscode/
+*.swp
