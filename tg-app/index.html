@@ -260,6 +260,24 @@
        СЛУЖЕБНЫЕ ЭЛЕМЕНТЫ (всегда поверх экранов)
        ════════════════════════════════════════════════════════════ -->
 
+  <!-- Оффер-модал — первый запуск -->
+  <div class="offer-overlay" id="offer-overlay" style="display:none">
+    <div class="offer-card">
+      <span class="offer-emoji">🎁</span>
+      <h2 class="offer-title">Ежедневник в подарок!</h2>
+      <p class="offer-sub">Подпишитесь на бота —<br>получите инструкцию</p>
+      <ul class="offer-bullets">
+        <li>Напомним о прибытии заказа</li>
+        <li>Первыми узнаёте о лимитированных наборах</li>
+        <li>Эксклюзивные акции для подписчиков</li>
+      </ul>
+      <a class="offer-btn" href="https://t.me/highliter_rus_bot?start=from_app" target="_blank" onclick="App.closeOffer()">
+        Получить подарок
+      </a>
+      <button class="offer-skip" onclick="App.closeOffer()">Пропустить</button>
+    </div>
+  </div>
+
   <!-- Toast-уведомление -->
   <div class="toast" id="toast"></div>
 

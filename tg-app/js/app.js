@@ -199,6 +199,16 @@ const App = {
     if (_backAction) _backAction();
   },
 
+  // ── Закрыть оффер-модал ─────────────────────────────────────────
+  closeOffer() {
+    const overlay = document.getElementById('offer-overlay');
+    if (!overlay) return;
+    localStorage.setItem('pm_offer_seen', '1');
+    overlay.classList.remove('visible');
+    setTimeout(() => { overlay.style.display = 'none'; }, 320);
+    Haptic.light();
+  },
+
   // ── Вернуться на главную после заказа ──────────────────────────
   goHome() {
     _history.length = 0;
@@ -1084,6 +1094,16 @@ document.querySelectorAll('.field-input').forEach(input =>
 // ════════════════════════════════════════════════════════════════
 
 Cart.load();
+
+// Оффер при первом запуске — показываем один раз
+if (!localStorage.getItem('pm_offer_seen')) {
+  const offerEl = document.getElementById('offer-overlay');
+  if (offerEl) {
+    offerEl.style.display = 'flex';
+    requestAnimationFrame(() => requestAnimationFrame(() => offerEl.classList.add('visible')));
+  }
+}
+
 App._currentTab = 'highlighters';
 App._renderCatalog('highlighters');
 _setBack(null);
