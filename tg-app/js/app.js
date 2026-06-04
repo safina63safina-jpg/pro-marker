@@ -199,6 +199,58 @@ const App = {
     if (_backAction) _backAction();
   },
 
+  // ── Онбординг ───────────────────────────────────────────────────
+  _renderOnboarding() {
+    const first = tg?.initDataUnsafe?.user?.first_name;
+    const el = document.getElementById('onboard-greeting');
+    if (el) el.textContent = first ? `Привет, ${first}! 👋` : 'Привет! 👋';
+  },
+
+  startApp() {
+    localStorage.setItem('pm_onboarded', '1');
+    Haptic.light();
+
+    const onboard = document.getElementById('screen-onboarding');
+    const catalog = document.getElementById('screen-catalog');
+
+    onboard.classList.add('behind');
+    onboard.classList.remove('active');
+    catalog.classList.add('active');
+    _curScreen = 'catalog';
+
+    setTimeout(() => {
+      onboard.style.transition = 'none';
+      onboard.classList.remove('behind');
+      requestAnimationFrame(() => { onboard.style.transition = ''; });
+    }, 290);
+
+    _setBack(null);
+    this._updateFAB('catalog');
+    this._updateNav('catalog');
+    this._updateNavBadge();
+
+    if (!localStorage.getItem('pm_offer_seen')) {
+      const offerEl = document.getElementById('offer-overlay');
+      if (offerEl) {
+        offerEl.style.display = 'flex';
+        requestAnimationFrame(() => requestAnimationFrame(() => offerEl.classList.add('visible')));
+      }
+    }
+  },
+
+  // ── Поделиться ботом ────────────────────────────────────────────
+  share() {
+    Haptic.light();
+    const url  = 'https://t.me/highliter_rus_bot';
+    const text = 'Посмотри — маркеры и стикеры-закладки для красивых записей 🎨';
+    const link = `https://t.me/share/url?url=${encodeURIComponent(url)}&text=${encodeURIComponent(text)}`;
+    if (tg) {
+      tg.openTelegramLink(link);
+    } else {
+      window.open(link, '_blank');
+    }
+  },
+
   // ── Закрыть оффер-модал ─────────────────────────────────────────
   closeOffer() {
     const overlay = document.getElementById('offer-overlay');
@@ -777,7 +829,7 @@ const App = {
     }
 
     const nav = document.getElementById('bottom-nav');
-    if (nav) nav.classList.toggle('hidden', screenId === 'success');
+    if (nav) nav.classList.toggle('hidden', screenId === 'success' || screenId === 'onboarding');
 
     ['nav-markers', 'nav-stickers', 'nav-cart', 'nav-gift'].forEach(id => {
       const el = document.getElementById(id);
@@ -1094,19 +1146,35 @@ document.querySelectorAll('.field-input').forEach(input =>
 // ════════════════════════════════════════════════════════════════
 
 Cart.load();
-
-// Оффер при первом запуске — показываем один раз
-if (!localStorage.getItem('pm_offer_seen')) {
-  const offerEl = document.getElementById('offer-overlay');
-  if (offerEl) {
-    offerEl.style.display = 'flex';
-    requestAnimationFrame(() => requestAnimationFrame(() => offerEl.classList.add('visible')));
-  }
-}
-
 App._currentTab = 'highlighters';
 App._renderCatalog('highlighters');
-_setBack(null);
-App._updateFAB('catalog');
-App._updateNav('catalog');
-App._updateNavBadge();
+
+if (localStorage.getItem('pm_onboarded')) {
+  // Возвращающийся пользователь — мгновенно переключаем на каталог
+  const s1 = document.getElementById('screen-onboarding');
+  const s2 = document.getElementById('screen-catalog');
+  s1.style.transition = 'none';
+  s2.style.transition = 'none';
+  s1.classList.remove('active');
+  s2.classList.add('active');
+  _curScreen = 'catalog';
+  requestAnimationFrame(() => { s1.style.transition = ''; s2.style.transition = ''; });
+  _setBack(null);
+  App._updateFAB('catalog');
+  App._updateNav('catalog');
+  App._updateNavBadge();
+  // Оффер если ещё не видел
+  if (!localStorage.getItem('pm_offer_seen')) {
+    const offerEl = document.getElementById('offer-overlay');
+    if (offerEl) {
+      offerEl.style.display = 'flex';
+      requestAnimationFrame(() => requestAnimationFrame(() => offerEl.classList.add('visible')));
+    }
+  }
+} else {
+  // Первый запуск — онбординг
+  _curScreen = 'onboarding';
+  App._renderOnboarding();
+  _setBack(null);
+  App._updateNav('onboarding');
+}

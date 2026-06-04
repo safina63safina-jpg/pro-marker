@@ -20,6 +20,49 @@
 <div id="app">
 
   <!-- ════════════════════════════════════════════════════════════
+       ЭКРАН 0: ОНБОРДИНГ (первый запуск)
+       ════════════════════════════════════════════════════════════ -->
+  <section class="screen active" id="screen-onboarding">
+    <div class="onboard-wrap">
+
+      <div class="onboard-brand">
+        <span class="onboard-brand-icon">✏️</span>
+        <span class="onboard-brand-name">Pro-Marker</span>
+      </div>
+
+      <h1 class="onboard-greeting" id="onboard-greeting">Привет! 👋</h1>
+      <p class="onboard-tagline">Добро пожаловать в магазин<br>творческих наборов</p>
+
+      <div class="onboard-features">
+        <div class="onboard-feature">
+          <span class="onboard-feature-icon">✏️</span>
+          <div class="onboard-feature-text">
+            <strong>Текстовыделители</strong>
+            <span>Пастельные наборы по 6 маркеров — для конспектов и планеров</span>
+          </div>
+        </div>
+        <div class="onboard-feature">
+          <span class="onboard-feature-icon">🔖</span>
+          <div class="onboard-feature-text">
+            <strong>Стикеры-закладки</strong>
+            <span>6 пластин с полосками — для навигации в блокноте</span>
+          </div>
+        </div>
+        <div class="onboard-feature">
+          <span class="onboard-feature-icon">🎁</span>
+          <div class="onboard-feature-text">
+            <strong>Программа лояльности</strong>
+            <span>Купи 10 наборов — получи ежедневник в подарок</span>
+          </div>
+        </div>
+      </div>
+
+      <button class="onboard-btn" onclick="App.startApp()">Начать</button>
+
+    </div>
+  </section>
+
+  <!-- ════════════════════════════════════════════════════════════
        ЭКРАН 1: ГЛАВНАЯ
        ════════════════════════════════════════════════════════════ -->
   <section class="screen" id="screen-home">
@@ -55,10 +98,18 @@
   <!-- ════════════════════════════════════════════════════════════
        ЭКРАН 2: КАТАЛОГ
        ════════════════════════════════════════════════════════════ -->
-  <section class="screen active" id="screen-catalog">
+  <section class="screen" id="screen-catalog">
 
     <div class="screen-header screen-header--main">
       <div class="screen-title" id="catalog-title">Текстовыделители</div>
+      <button class="header-share-btn" onclick="App.share()" aria-label="Поделиться">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <circle cx="18" cy="5" r="3" stroke="currentColor" stroke-width="2"/>
+          <circle cx="6" cy="12" r="3" stroke="currentColor" stroke-width="2"/>
+          <circle cx="18" cy="19" r="3" stroke="currentColor" stroke-width="2"/>
+          <path d="M8.59 13.51l6.83 3.98M15.41 6.51l-6.82 3.98" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      </button>
     </div>
 
     <!-- Сетки товаров рендерятся сюда через JS -->
@@ -251,6 +302,9 @@
       </button>
       <button class="gift-btn gift-btn--cool" onclick="App.navigate('catalog',{tab:'stickers'})">
         🔖 Выбрать стикеры-закладки
+      </button>
+      <button class="gift-btn gift-btn--share" onclick="App.share()">
+        🔗 Поделиться с другом
       </button>
     </div>
 
