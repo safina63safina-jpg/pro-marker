@@ -280,7 +280,7 @@ const App = {
 
   _renderCatalog(catKey) {
     const titleEl = document.getElementById('catalog-title');
-    if (titleEl) titleEl.textContent = catKey === 'highlighters' ? 'Маркеры' : 'Стикеры';
+    if (titleEl) titleEl.textContent = catKey === 'highlighters' ? 'Текстовыделители' : 'Стикеры-закладки';
     const body = document.getElementById('catalog-body');
     const { seasonalActive, regular, otherSeasons, currentSeason } = getCategoryProducts(catKey);
     const cur = currentSeason;
@@ -299,6 +299,13 @@ const App = {
       // Секция 3: заблокированные
       `<div class="section-label">🔒 Другие сезоны</div>
        <div class="product-grid">${otherSeasons.map(p => this._cardHTML(p)).join('')}</div>`;
+
+    // Стаггер-появление: каждая карточка вылетает с задержкой 30ms
+    body.querySelectorAll('.product-card').forEach((card, i) => {
+      card.style.setProperty('--card-delay', (i * 30) + 'ms');
+      card.classList.add('card-fresh');
+      card.addEventListener('animationend', () => card.classList.remove('card-fresh'), { once: true });
+    });
 
     // Навесить события
     body.querySelectorAll('.product-card:not(.locked)').forEach(card => {
@@ -332,8 +339,11 @@ const App = {
   },
 
   _cardHTML(p) {
-    const s       = p.season ? SEASON[p.season] : null;
-    const badge   = s && !p.locked ? `<div class="card-badge">${s.emoji} ${s.name}</div>` : '';
+    const s     = p.season ? SEASON[p.season] : null;
+    let badge   = '';
+    if (s && !p.locked)        badge = `<div class="card-badge">${s.emoji} ${s.name}</div>`;
+    else if (p.badge === 'hot')  badge = `<div class="card-badge card-badge--hot">🔥 хит продаж</div>`;
+    else if (p.badge === 'week') badge = `<div class="card-badge card-badge--week">⭐ лидер недели</div>`;
     const overlay = p.locked
       ? `<div class="locked-overlay">
            <span class="locked-icon">🔒</span>
@@ -749,9 +759,61 @@ const App = {
   _cardAdd(id) {
     const product = getProductById(id);
     if (!product) return;
+
+    const card    = document.querySelector(`.product-card[data-id="${id}"]`);
+    const cartNav = document.getElementById('nav-cart');
+    if (card && cartNav) this._flyToCart(card.querySelector('img'), cartNav);
+
     Cart.add(product, 1);
     this._updateCardControl(id);
     Haptic.medium();
+  },
+
+  _flyToCart(imgEl, destEl) {
+    if (!imgEl || !destEl) return;
+    const from = imgEl.getBoundingClientRect();
+    const to   = destEl.getBoundingClientRect();
+
+    const fly = document.createElement('img');
+    fly.src   = imgEl.src;
+    Object.assign(fly.style, {
+      position:      'fixed',
+      left:          from.left   + 'px',
+      top:           from.top    + 'px',
+      width:         from.width  + 'px',
+      height:        from.height + 'px',
+      borderRadius:  '10px',
+      objectFit:     'cover',
+      pointerEvents: 'none',
+      zIndex:        '999',
+      transition:    'none',
+      willChange:    'transform, opacity',
+    });
+    document.body.appendChild(fly);
+
+    fly.getBoundingClientRect(); // force reflow
+
+    const dx    = to.left + to.width  / 2 - from.left - from.width  / 2;
+    const dy    = to.top  + to.height / 2 - from.top  - from.height / 2;
+    const scale = 32 / Math.max(from.width, from.height);
+
+    fly.style.transition = 'transform 500ms cubic-bezier(0.4,0,0.6,1), opacity 360ms ease 150ms';
+    fly.style.transform  = `translate(${dx}px, ${dy}px) scale(${scale})`;
+    fly.style.opacity    = '0';
+
+    fly.addEventListener('transitionend', (e) => {
+      if (e.propertyName !== 'transform') return;
+      fly.remove();
+      this._popCartIcon();
+    });
+  },
+
+  _popCartIcon() {
+    const wrap = document.querySelector('#nav-cart .nav-icon-wrap');
+    if (!wrap) return;
+    wrap.classList.remove('cart-pop');
+    requestAnimationFrame(() => wrap.classList.add('cart-pop'));
+    wrap.addEventListener('animationend', () => wrap.classList.remove('cart-pop'), { once: true });
   },
 
   _cardDelta(id, delta) {

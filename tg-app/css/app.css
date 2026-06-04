@@ -79,10 +79,28 @@ input { font-family: inherit; }
   top: 0;
   z-index: 10;
   background: var(--bg);
-  padding: 14px 16px 12px 60px; /* 60px слева — под кнопку «Назад» */
+  display: flex;
+  align-items: center;
+  min-height: 68px; /* 12px + 44px кнопка + 12px = центр на 34px */
+  padding: 0 16px 0 60px;
   border-bottom: 1px solid color-mix(in srgb, var(--bg2) 80%, transparent);
 }
 .screen-title { font-size: 20px; font-weight: 700; letter-spacing: -0.3px; }
+
+/* ── Фирменная шапка (каталог и корзина) ─────────────────────── */
+.screen-header--main {
+  background: var(--bg2);
+  border-bottom: none;
+  box-shadow: 0 1px 0 color-mix(in srgb, var(--hint) 18%, transparent);
+  padding: 0 16px 0 74px; /* чуть правее обычного */
+}
+.screen-header--main .screen-title {
+  font-family: 'Nunito', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 23px;
+  font-weight: 800;
+  letter-spacing: -0.4px;
+  line-height: 1.1;
+}
 
 /* ── ГЛАВНАЯ ─────────────────────────────────────────────────── */
 .home-greeting { padding: 22px 16px 4px; }
@@ -326,6 +344,9 @@ input { font-family: inherit; }
   letter-spacing: 0.3px;
 }
 
+.card-badge--hot  { background: linear-gradient(135deg, #ff5a1f 0%, #e8200e 100%); backdrop-filter: none; -webkit-backdrop-filter: none; }
+.card-badge--week { background: linear-gradient(135deg, #7b4eff 0%, #2aabee 100%); backdrop-filter: none; -webkit-backdrop-filter: none; }
+
 /* Заблокированная карточка */
 .product-card.locked { cursor: default; }
 .product-card.locked img { filter: brightness(0.38) saturate(0.2); }
@@ -360,6 +381,15 @@ input { font-family: inherit; }
   80%       { transform: translateX(4px); }
 }
 .product-card.shaking { animation: shake 0.38s ease-in-out; }
+
+/* Появление карточек при смене категории */
+@keyframes card-appear {
+  from { opacity: 0; transform: scale(0.85) translateY(6px); }
+  to   { opacity: 1; transform: scale(1)    translateY(0);   }
+}
+.product-card.card-fresh {
+  animation: card-appear 270ms cubic-bezier(0.34, 1.56, 0.64, 1) var(--card-delay, 0ms) both;
+}
 
 /* ── ЭКРАН ТОВАРА ────────────────────────────────────────────── */
 .product-hero {
@@ -570,13 +600,11 @@ input { font-family: inherit; }
 }
 .cart-del:active { color: #e53935; background: rgba(229,57,53,0.1); }
 
-/* Итог */
+/* Итог — часть скроллируемого потока, сразу после последнего товара */
 .cart-footer {
-  position: sticky;
-  bottom: calc(64px + env(safe-area-inset-bottom, 0px));
-  background: var(--bg);
+  margin-top: 4px;
+  padding: 16px 16px 20px;
   border-top: 1px solid var(--bg2);
-  padding: 12px 16px;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -759,6 +787,16 @@ input { font-family: inherit; }
   100% { transform: scale(1); }
 }
 .fab-count.pop { animation: badge-pop 0.28s ease-out; }
+
+@keyframes cart-icon-pop {
+  0%   { transform: scale(1); }
+  38%  { transform: scale(1.32); }
+  68%  { transform: scale(0.91); }
+  100% { transform: scale(1); }
+}
+.nav-icon-wrap.cart-pop {
+  animation: cart-icon-pop 0.42s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
 
 /* ── Toast ───────────────────────────────────────────────────── */
 .toast {

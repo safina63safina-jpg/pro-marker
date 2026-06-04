@@ -60,9 +60,9 @@ const CATALOG = {
 
     // 6 наборов в постоянном каталоге
     regular: [
-      { id: 'h-r-1', name: 'Пастельный рассвет',   image: '../photos/IMG_8384.PNG' },
+      { id: 'h-r-1', name: 'Пастельный рассвет',   image: '../photos/IMG_8384.PNG', badge: 'hot' },
       { id: 'h-r-2', name: 'Нежный иней',           image: '../photos/IMG_8385.PNG' },
-      { id: 'h-r-3', name: 'Ботанический этюд',     image: '../photos/IMG_8386.PNG' },
+      { id: 'h-r-3', name: 'Ботанический этюд',     image: '../photos/IMG_8386.PNG', badge: 'week' },
       { id: 'h-r-4', name: 'Акварельный этюд',      image: '../photos/IMG_8387.PNG' },
       { id: 'h-r-5', name: 'Розовый туман',         image: '../photos/IMG_8388.PNG' },
       { id: 'h-r-6', name: 'Лавандовые сны',        image: '../photos/IMG_8389.PNG' },
@@ -96,9 +96,9 @@ const CATALOG = {
     price: 470,
 
     regular: [
-      { id: 's-r-1', name: 'Акварельный сад',   image: '../photos/IMG_8403.PNG' },
+      { id: 's-r-1', name: 'Акварельный сад',   image: '../photos/IMG_8403.PNG', badge: 'hot' },
       { id: 's-r-2', name: 'Пастельные мечты',  image: '../photos/IMG_8404.PNG' },
-      { id: 's-r-3', name: 'Лавандовый бриз',   image: '../photos/IMG_8405.PNG' },
+      { id: 's-r-3', name: 'Лавандовый бриз',   image: '../photos/IMG_8405.PNG', badge: 'week' },
       { id: 's-r-4', name: 'Нежный персик',     image: '../photos/IMG_8406.PNG' },
       { id: 's-r-5', name: 'Мятный свежий',     image: '../photos/IMG_8407.PNG' },
       { id: 's-r-6', name: 'Ванильное небо',    image: '../photos/IMG_8408.PNG' },
