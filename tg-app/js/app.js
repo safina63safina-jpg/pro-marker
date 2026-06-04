@@ -246,6 +246,7 @@ const App = {
       case 'cart':     this._renderCart(); break;
       case 'checkout': this._initCheckout(); break;
       case 'success':  this._renderSuccess(); break;
+      case 'gift':     this._renderGift(); break;
     }
   },
 
@@ -619,6 +620,10 @@ const App = {
       console.log('ORDER:', message);
     }
 
+    // Сохраняем прогресс программы лояльности
+    const totalSets = Cart.items.reduce((s, i) => s + i.qty, 0);
+    this._addGiftProgress(totalSets);
+
     // Передаём номер заказа на экран успеха
     this._pendingOrderNo = orderNo;
     this.navigate('success');
@@ -685,6 +690,11 @@ const App = {
         _setBack(null);
         _setMain(null, null);
         break;
+
+      case 'gift':
+        _setBack(_history.length > 0 ? () => this.goBack() : null);
+        _setMain(null, null);
+        break;
     }
   },
 
@@ -715,9 +725,9 @@ const App = {
         }
         break;
       case 'cart':     this.navigate('cart'); break;
-      case 'bouquet':
-        Haptic.light();
-        toast('🌸 Раздел «Букет» скоро появится');
+      case 'gift':
+        if (_curScreen === 'gift') { Haptic.light(); return; }
+        this.navigate('gift');
         break;
     }
   },
@@ -728,12 +738,14 @@ const App = {
       activeId = this._currentTab === 'highlighters' ? 'nav-markers' : 'nav-stickers';
     } else if (screenId === 'cart' || screenId === 'checkout') {
       activeId = 'nav-cart';
+    } else if (screenId === 'gift') {
+      activeId = 'nav-gift';
     }
 
     const nav = document.getElementById('bottom-nav');
     if (nav) nav.classList.toggle('hidden', screenId === 'success');
 
-    ['nav-markers', 'nav-stickers', 'nav-cart', 'nav-bouquet'].forEach(id => {
+    ['nav-markers', 'nav-stickers', 'nav-cart', 'nav-gift'].forEach(id => {
       const el = document.getElementById(id);
       if (el) el.classList.toggle('active', id === activeId);
     });
@@ -844,6 +856,64 @@ const App = {
            <button class="card-qty-btn" onclick="event.stopPropagation();App._cardDelta('${id}',+1)">+</button>
          </div>`
     );
+  },
+
+  // ════════════════════════════════════════════════════════════════
+  // ПРОГРАММА ЛОЯЛЬНОСТИ (ПОДАРОК)
+  // ════════════════════════════════════════════════════════════════
+
+  _getGiftProgress() {
+    return Math.min(10, 2 + parseInt(localStorage.getItem('pm_gift') || '0'));
+  },
+
+  _addGiftProgress(n) {
+    const cur = parseInt(localStorage.getItem('pm_gift') || '0');
+    localStorage.setItem('pm_gift', String(cur + n));
+  },
+
+  _plural(n, one, few, many) {
+    const m10 = n % 10, m100 = n % 100;
+    if (m10 === 1 && m100 !== 11) return one;
+    if (m10 >= 2 && m10 <= 4 && (m100 < 10 || m100 >= 20)) return few;
+    return many;
+  },
+
+  _renderGift() {
+    const prog     = this._getGiftProgress();
+    const unlocked = prog >= 10;
+
+    document.getElementById('gift-unlocked-banner').style.display = unlocked ? 'block' : 'none';
+    document.getElementById('gift-count').textContent = prog + ' / 10';
+
+    const slotsEl = document.getElementById('gift-slots');
+    slotsEl.innerHTML = Array.from({ length: 10 }, (_, i) => {
+      const isPre    = i < 2;
+      const isBought = !isPre && i < prog;
+      const filled   = isPre || isBought;
+      return `<div class="gift-slot${filled ? ' filled' : ''}${isPre ? ' filled--pre' : ''}">
+        ${isPre ? '⭐' : (isBought ? '✓' : '')}
+      </div>`;
+    }).join('');
+
+    document.getElementById('gift-progress-fill').style.width = (prog / 10 * 100) + '%';
+
+    const textEl = document.getElementById('gift-progress-text');
+    if (unlocked) {
+      textEl.textContent  = '🎉 Подарок разблокирован!';
+      textEl.style.color  = '#FF7B42';
+      textEl.style.fontWeight = '800';
+    } else {
+      const left = 10 - prog;
+      textEl.textContent  = `Ещё ${left} ${this._plural(left, 'набор', 'набора', 'наборов')} до подарка`;
+      textEl.style.color  = '';
+      textEl.style.fontWeight = '';
+    }
+
+    slotsEl.querySelectorAll('.gift-slot.filled').forEach((slot, i) => {
+      slot.style.setProperty('--slot-delay', (i * 55) + 'ms');
+      slot.classList.add('slot-pop');
+      slot.addEventListener('animationend', () => slot.classList.remove('slot-pop'), { once: true });
+    });
   },
 
   // ════════════════════════════════════════════════════════════════

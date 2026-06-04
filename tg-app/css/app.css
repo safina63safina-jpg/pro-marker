@@ -931,30 +931,276 @@ input { font-family: inherit; }
 .nav-badge.pop { animation: badge-pop 0.26s ease-out; }
 
 /* Букет — особый стиль */
-.nav-item--bouquet .nav-icon-wrap {
+.nav-item--gift .nav-icon-wrap {
   width: 52px;
   height: 32px;
   border-radius: 14px;
   background: linear-gradient(135deg, #FF7B42 0%, #FFD060 100%);
   color: #fff;
   box-shadow: 0 3px 14px rgba(255, 123, 66, 0.42);
-  animation: bouquet-glow 2.8s ease-in-out infinite;
+  animation: gift-glow 2.8s ease-in-out infinite;
 }
-.nav-item--bouquet.active .nav-icon-wrap,
-.nav-item--bouquet .nav-icon-wrap { /* override default active bg */ }
-.nav-item--bouquet:active .nav-icon-wrap {
+.nav-item--gift.active .nav-icon-wrap,
+.nav-item--gift .nav-icon-wrap { /* override default active bg */ }
+.nav-item--gift:active .nav-icon-wrap {
   animation: none;
   transform: scale(0.91);
   box-shadow: 0 2px 6px rgba(255, 123, 66, 0.3);
 }
-.nav-item--bouquet .nav-label {
+.nav-item--gift .nav-label {
   color: #E8681F;
   font-weight: 700;
 }
 
-@keyframes bouquet-glow {
+@keyframes gift-glow {
   0%, 100% { box-shadow: 0 3px 14px rgba(255, 123, 66, 0.42); }
   50%       { box-shadow: 0 4px 22px rgba(255, 123, 66, 0.70); }
+}
+
+/* ── ЭКРАН ПОДАРКА ───────────────────────────────────────────── */
+
+/* Шапка — тёплый градиент */
+.screen-header--gift {
+  background: linear-gradient(135deg, #FF7B42 0%, #FFB347 55%, #FFD060 100%);
+  border-bottom: none;
+  padding: 0 16px 0 74px;
+  box-shadow: 0 2px 16px rgba(255, 123, 66, 0.28);
+}
+.screen-header--gift .screen-title {
+  font-family: 'Nunito', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 23px;
+  font-weight: 800;
+  letter-spacing: -0.4px;
+  color: #fff;
+}
+
+/* Баннер «разблокировано» */
+.gift-unlocked-banner {
+  margin: 16px 16px 0;
+  padding: 24px 20px 20px;
+  background: linear-gradient(135deg, rgba(255,123,66,0.13) 0%, rgba(255,208,96,0.13) 100%);
+  border: 2px solid rgba(255, 123, 66, 0.35);
+  border-radius: 22px;
+  text-align: center;
+}
+.gift-unlocked-confetti {
+  font-size: 22px;
+  letter-spacing: 4px;
+  margin-bottom: 10px;
+  animation: confetti-dance 1.6s ease-in-out infinite alternate;
+}
+@keyframes confetti-dance {
+  from { transform: rotate(-3deg) scale(0.97); }
+  to   { transform: rotate(3deg)  scale(1.03); }
+}
+.gift-unlocked-icon { font-size: 54px; line-height: 1; margin-bottom: 10px; }
+.gift-unlocked-title {
+  font-size: 24px;
+  font-weight: 900;
+  color: #FF7B42;
+  letter-spacing: -0.4px;
+  margin-bottom: 8px;
+}
+.gift-unlocked-desc { font-size: 14px; color: var(--hint); line-height: 1.6; margin-bottom: 16px; }
+.gift-unlocked-img {
+  width: 100%;
+  max-width: 200px;
+  border-radius: 18px;
+  margin: 0 auto;
+  box-shadow: 0 8px 28px rgba(0,0,0,0.22);
+}
+
+/* Герой */
+.gift-hero {
+  position: relative;
+  padding: 26px 20px 20px;
+  text-align: center;
+  background: linear-gradient(180deg, rgba(255,123,66,0.08) 0%, transparent 100%);
+  overflow: hidden;
+}
+.gift-hero-icon {
+  font-size: 58px;
+  line-height: 1;
+  margin-bottom: 14px;
+  filter: drop-shadow(0 4px 14px rgba(255,123,66,0.38));
+  display: block;
+  animation: gift-float 3.2s ease-in-out infinite;
+}
+@keyframes gift-float {
+  0%, 100% { transform: translateY(0) rotate(-2deg); }
+  50%       { transform: translateY(-7px) rotate(2deg); }
+}
+.gift-hero-title {
+  font-size: 24px;
+  font-weight: 900;
+  letter-spacing: -0.5px;
+  line-height: 1.2;
+  color: var(--text);
+  margin-bottom: 7px;
+}
+.gift-hero-sub { font-size: 14px; color: var(--hint); }
+
+/* Декоративные искры */
+.gift-hero-sparkles { position: absolute; inset: 0; pointer-events: none; }
+.spark {
+  position: absolute;
+  font-size: 15px;
+  color: #FFB347;
+  animation: spark-pulse 2.6s ease-in-out infinite;
+}
+.s1 { top: 18%; left: 10%;  animation-delay: 0s; }
+.s2 { top: 28%; right: 9%;  animation-delay: 0.7s; }
+.s3 { bottom: 16%; left: 18%; animation-delay: 1.3s; }
+.s4 { bottom: 22%; right: 14%; animation-delay: 1.9s; }
+@keyframes spark-pulse {
+  0%, 100% { opacity: 0.25; transform: scale(0.8) rotate(0deg); }
+  50%       { opacity: 0.9;  transform: scale(1.4) rotate(20deg); }
+}
+
+/* Карточка лояльности */
+.gift-card {
+  margin: 0 16px 14px;
+  background: var(--bg2);
+  border-radius: 22px;
+  padding: 18px 16px 20px;
+  box-shadow: var(--shadow);
+}
+.gift-card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+.gift-card-label {
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.9px;
+  color: var(--hint);
+}
+.gift-card-count {
+  font-size: 20px;
+  font-weight: 900;
+  letter-spacing: -0.3px;
+  color: #FF7B42;
+}
+
+/* 10 слотов — 5 × 2 */
+.gift-slots {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 10px;
+  margin-bottom: 16px;
+}
+.gift-slot {
+  aspect-ratio: 1;
+  border-radius: 50%;
+  border: 2.5px solid color-mix(in srgb, var(--hint) 35%, transparent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+  font-weight: 700;
+  color: #fff;
+  background: transparent;
+  transition: all 350ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.gift-slot.filled {
+  background: linear-gradient(135deg, #FF7B42, #FFD060);
+  border-color: transparent;
+  box-shadow: 0 3px 12px rgba(255,123,66,0.42);
+}
+.gift-slot.filled--pre {
+  background: linear-gradient(135deg, #2AABEE, #7B61FF);
+  box-shadow: 0 3px 12px rgba(42,171,238,0.42);
+}
+
+/* Stagger-анимация слотов при открытии */
+@keyframes slot-appear {
+  from { opacity: 0; transform: scale(0.5); }
+  to   { opacity: 1; transform: scale(1); }
+}
+.gift-slot.slot-pop {
+  animation: slot-appear 340ms cubic-bezier(0.34, 1.56, 0.64, 1) var(--slot-delay, 0ms) both;
+}
+
+/* Прогресс-бар */
+.gift-progress-wrap { text-align: center; }
+.gift-progress-track {
+  height: 7px;
+  background: color-mix(in srgb, var(--hint) 18%, transparent);
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 9px;
+}
+.gift-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #FF7B42, #FFD060);
+  border-radius: 4px;
+  transition: width 650ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.gift-progress-text { font-size: 13px; color: var(--hint); font-weight: 600; }
+
+/* Карточка награды */
+.gift-prize-section { padding: 0 16px 4px; }
+.gift-prize-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: var(--bg2);
+  border-radius: 20px;
+  padding: 14px 16px;
+  box-shadow: var(--shadow);
+  margin-top: 10px;
+}
+.gift-prize-img {
+  width: 76px;
+  height: 76px;
+  border-radius: 14px;
+  object-fit: cover;
+  flex-shrink: 0;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.16);
+}
+.gift-prize-info { flex: 1; min-width: 0; }
+.gift-prize-name { font-size: 16px; font-weight: 800; margin-bottom: 4px; }
+.gift-prize-desc { font-size: 12px; color: var(--hint); line-height: 1.45; }
+.gift-prize-tag {
+  display: inline-block;
+  margin-top: 6px;
+  padding: 3px 11px;
+  border-radius: var(--r-pill);
+  background: rgba(42,171,238,0.14);
+  color: var(--accent);
+  font-size: 11px;
+  font-weight: 800;
+}
+
+/* Кнопки-призывы */
+.gift-actions {
+  padding: 16px 16px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 11px;
+}
+.gift-btn {
+  width: 100%;
+  height: 56px;
+  border-radius: var(--r-btn);
+  font-size: 16px;
+  font-weight: 800;
+  letter-spacing: 0.2px;
+  transition: opacity 130ms ease, transform 130ms ease;
+}
+.gift-btn:active { opacity: 0.82; transform: scale(0.97); }
+.gift-btn--warm {
+  background: linear-gradient(135deg, #FF7B42 0%, #FFB347 100%);
+  color: #fff;
+  box-shadow: 0 5px 20px rgba(255,123,66,0.4);
+}
+.gift-btn--cool {
+  background: linear-gradient(135deg, #2AABEE 0%, #7B61FF 100%);
+  color: #fff;
+  box-shadow: 0 5px 20px rgba(42,171,238,0.34);
 }
 
 /* ── Skeleton-загрузка ───────────────────────────────────────── */

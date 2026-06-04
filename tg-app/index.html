@@ -185,6 +185,77 @@
   </section>
 
   <!-- ════════════════════════════════════════════════════════════
+       ЭКРАН 7: ПОДАРОК (программа лояльности)
+       ════════════════════════════════════════════════════════════ -->
+  <section class="screen" id="screen-gift">
+
+    <div class="screen-header screen-header--gift">
+      <div class="screen-title">🎁 Подарок</div>
+    </div>
+
+    <!-- Баннер «Разблокировано» — показывается когда прогресс достиг 10 -->
+    <div class="gift-unlocked-banner" id="gift-unlocked-banner" style="display:none">
+      <div class="gift-unlocked-confetti" aria-hidden="true">🎊 🎉 🎊 🎉 🎊</div>
+      <div class="gift-unlocked-icon">🎁</div>
+      <div class="gift-unlocked-title">Ты это сделал!</div>
+      <p class="gift-unlocked-desc">Ежедневник ждёт тебя — просто покажи этот экран при оформлении заказа!</p>
+      <img src="../photos/IMG_8650.PNG" alt="Ежедневник" class="gift-unlocked-img">
+    </div>
+
+    <!-- Герой -->
+    <div class="gift-hero">
+      <div class="gift-hero-sparkles" aria-hidden="true">
+        <span class="spark s1">✦</span>
+        <span class="spark s2">✦</span>
+        <span class="spark s3">✦</span>
+        <span class="spark s4">✦</span>
+      </div>
+      <div class="gift-hero-icon">🎁</div>
+      <h2 class="gift-hero-title">Купи 10 наборов —<br>получи ежедневник</h2>
+      <p class="gift-hero-sub">Маркеры и стикеры-закладки — всё считается</p>
+    </div>
+
+    <!-- Карточка лояльности -->
+    <div class="gift-card">
+      <div class="gift-card-top">
+        <span class="gift-card-label">Карточка лояльности</span>
+        <span class="gift-card-count" id="gift-count">2 / 10</span>
+      </div>
+      <div class="gift-slots" id="gift-slots"></div>
+      <div class="gift-progress-wrap">
+        <div class="gift-progress-track">
+          <div class="gift-progress-fill" id="gift-progress-fill"></div>
+        </div>
+        <span class="gift-progress-text" id="gift-progress-text">Ещё 8 наборов до подарка</span>
+      </div>
+    </div>
+
+    <!-- Описание подарка -->
+    <div class="gift-prize-section">
+      <div class="section-label">🎀 Твой подарок</div>
+      <div class="gift-prize-card">
+        <img src="../photos/IMG_8650.PNG" alt="Ежедневник" class="gift-prize-img">
+        <div class="gift-prize-info">
+          <div class="gift-prize-name">Красивый ежедневник</div>
+          <div class="gift-prize-desc">Стильный ежедневник от Pro-Marker к заказу</div>
+          <div class="gift-prize-tag">бесплатно в подарок 🎁</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Большие призывы к действию -->
+    <div class="gift-actions">
+      <button class="gift-btn gift-btn--warm" onclick="App.navigate('catalog',{tab:'highlighters'})">
+        ✏️ Выбрать текстовыделители
+      </button>
+      <button class="gift-btn gift-btn--cool" onclick="App.navigate('catalog',{tab:'stickers'})">
+        🔖 Выбрать стикеры-закладки
+      </button>
+    </div>
+
+  </section>
+
+  <!-- ════════════════════════════════════════════════════════════
        СЛУЖЕБНЫЕ ЭЛЕМЕНТЫ (всегда поверх экранов)
        ════════════════════════════════════════════════════════════ -->
 
@@ -243,17 +314,17 @@
       <span class="nav-label">Корзина</span>
     </button>
 
-    <button class="nav-item nav-item--bouquet" id="nav-bouquet" onclick="App.navTo('bouquet')">
+    <button class="nav-item nav-item--gift" id="nav-gift" onclick="App.navTo('gift')">
       <span class="nav-icon-wrap">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-          <circle cx="8.5" cy="8.5" r="2.5" stroke="currentColor" stroke-width="1.9"/>
-          <circle cx="15.5" cy="8.5" r="2.5" stroke="currentColor" stroke-width="1.9"/>
-          <circle cx="12"   cy="5.5" r="2.5" stroke="currentColor" stroke-width="1.9"/>
-          <path d="M8.5 11C8.5 14.5 10 17.5 12 19c2-1.5 3.5-4.5 3.5-8" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/>
-          <path d="M12 19v2.5" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/>
+        <svg width="21" height="21" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M20 12v10H4V12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M22 7H2v5h20V7z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M12 22V7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M12 7H7.5a2.5 2.5 0 010-5C11 2 12 7 12 7z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M12 7h4.5a2.5 2.5 0 000-5C13 2 12 7 12 7z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
       </span>
-      <span class="nav-label">Букет</span>
+      <span class="nav-label">Подарок</span>
     </button>
 
   </nav>
