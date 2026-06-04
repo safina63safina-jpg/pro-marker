@@ -1,6 +1,6 @@
 const express        = require('express');
 const router         = express.Router();
-const pool           = require('../services/db');
+const supabase       = require('../services/db');
 const verifyInitData = require('../middleware/verifyInitData');
 const { createInvoiceLink } = require('../services/telegram');
 
@@ -16,20 +16,17 @@ router.post('/', async (req, res) => {
 
     const order_no = '#' + String(Date.now()).slice(-4).padStart(4, '0');
 
-    await pool.query(
-      `INSERT INTO orders
-         (order_no, tg_user_id, tg_username, tg_fullname, recipient_name, items, total_rub)
-       VALUES ($1,$2,$3,$4,$5,$6,$7)`,
-      [
-        order_no,
-        user.id,
-        user.username || null,
-        [user.first_name, user.last_name].filter(Boolean).join(' '),
-        recipient_name,
-        JSON.stringify(items),
-        total_rub,
-      ]
-    );
+    const { error: insertError } = await supabase.from('orders').insert({
+      order_no,
+      tg_user_id:     user.id,
+      tg_username:    user.username || null,
+      tg_fullname:    [user.first_name, user.last_name].filter(Boolean).join(' '),
+      recipient_name,
+      items:          JSON.stringify(items),
+      total_rub,
+    });
+
+    if (insertError) throw new Error(insertError.message);
 
     const invoice_link = await createInvoiceLink(order_no, items, total_rub);
     res.json({ order_no, invoice_link });

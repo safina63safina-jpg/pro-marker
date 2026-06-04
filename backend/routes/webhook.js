@@ -1,6 +1,6 @@
-const express = require('express');
-const router  = express.Router();
-const pool    = require('../services/db');
+const express  = require('express');
+const router   = express.Router();
+const supabase = require('../services/db');
 const { call, notifyManager } = require('../services/telegram');
 
 router.post('/telegram', async (req, res) => {
@@ -12,10 +12,9 @@ router.post('/telegram', async (req, res) => {
     // 1. Подтверждение перед оплатой
     if (update.pre_checkout_query) {
       const pq = update.pre_checkout_query;
-      const { rows } = await pool.query(
-        'SELECT * FROM orders WHERE order_no = $1', [pq.invoice_payload]
-      );
-      const order = rows[0];
+      const { data: rows } = await supabase.from('orders')
+        .select('*').eq('order_no', pq.invoice_payload);
+      const order = rows?.[0];
       const valid = order && order.status === 'pending' && order.total_rub * 100 === pq.total_amount;
 
       await call('answerPreCheckoutQuery', {
@@ -31,13 +30,16 @@ router.post('/telegram', async (req, res) => {
       const payment  = update.message.successful_payment;
       const order_no = payment.invoice_payload;
 
-      const { rows } = await pool.query(
-        `UPDATE orders SET status='paid', payment_id=$1, paid_at=NOW()
-         WHERE order_no=$2 RETURNING *`,
-        [payment.telegram_payment_charge_id, order_no]
-      );
+      const { data: rows } = await supabase.from('orders')
+        .update({
+          status:     'paid',
+          payment_id: payment.telegram_payment_charge_id,
+          paid_at:    new Date().toISOString(),
+        })
+        .eq('order_no', order_no)
+        .select('*');
 
-      if (rows[0]) await notifyManager(rows[0]);
+      if (rows?.[0]) await notifyManager(rows[0]);
       return;
     }
 
@@ -48,12 +50,14 @@ router.post('/telegram', async (req, res) => {
       const chatId = msg.chat.id;
 
       if (text === '/orders' || text === '/orders paid') {
-        const where  = text === '/orders paid' ? `WHERE status='paid'` : '';
-        const { rows } = await pool.query(
-          `SELECT order_no, status, tg_fullname, total_rub, created_at
-           FROM orders ${where} ORDER BY created_at DESC LIMIT 10`
-        );
-        if (!rows.length) {
+        let query = supabase.from('orders')
+          .select('order_no, status, tg_fullname, total_rub, created_at')
+          .order('created_at', { ascending: false })
+          .limit(10);
+        if (text === '/orders paid') query = query.eq('status', 'paid');
+        const { data: rows } = await query;
+
+        if (!rows?.length) {
           await call('sendMessage', { chat_id: chatId, text: 'Заказов нет' });
           return;
         }
@@ -65,14 +69,16 @@ router.post('/telegram', async (req, res) => {
       }
 
       if (text.startsWith('/order ')) {
-        const order_no   = text.split(' ')[1];
-        const { rows } = await pool.query('SELECT * FROM orders WHERE order_no=$1', [order_no]);
-        if (!rows[0]) {
+        const order_no = text.split(' ')[1];
+        const { data: rows } = await supabase.from('orders')
+          .select('*').eq('order_no', order_no);
+        if (!rows?.[0]) {
           await call('sendMessage', { chat_id: chatId, text: `${order_no} не найден` });
           return;
         }
         const o = rows[0];
-        const lines = o.items.map(i => `  • ${i.name} × ${i.qty} = ${i.price * i.qty} ₽`).join('\n');
+        const items = typeof o.items === 'string' ? JSON.parse(o.items) : o.items;
+        const lines = items.map(i => `  • ${i.name} × ${i.qty} = ${i.price * i.qty} ₽`).join('\n');
         await call('sendMessage', {
           chat_id: chatId,
           text: `📦 ${o.order_no} | ${o.status}\n👤 ${o.tg_fullname}\n\n${lines}\n\nИтого: ${o.total_rub} ₽`,
@@ -90,10 +96,11 @@ router.post('/telegram', async (req, res) => {
           await call('sendMessage', { chat_id: chatId, text: 'Статусы: pending, paid, contacted, shipped, done' });
           return;
         }
-        const { rows } = await pool.query(
-          `UPDATE orders SET status=$1 WHERE order_no=$2 RETURNING order_no`, [newStatus, order_no]
-        );
-        const reply = rows[0] ? `✅ ${order_no} → ${newStatus}` : `${order_no} не найден`;
+        const { data: rows } = await supabase.from('orders')
+          .update({ status: newStatus })
+          .eq('order_no', order_no)
+          .select('order_no');
+        const reply = rows?.[0] ? `✅ ${order_no} → ${newStatus}` : `${order_no} не найден`;
         await call('sendMessage', { chat_id: chatId, text: reply });
         return;
       }
@@ -103,7 +110,7 @@ router.post('/telegram', async (req, res) => {
     if (update.callback_query?.data?.startsWith('contacted:')) {
       const cq       = update.callback_query;
       const order_no = cq.data.split(':')[1];
-      await pool.query(`UPDATE orders SET status='contacted' WHERE order_no=$1`, [order_no]);
+      await supabase.from('orders').update({ status: 'contacted' }).eq('order_no', order_no);
       await call('answerCallbackQuery', { callback_query_id: cq.id, text: `${order_no} → contacted` });
     }
   } catch (err) {
