@@ -1,5 +1,6 @@
 {
   "buildCommand": "node build.js",
+  "outputDirectory": ".",
   "rewrites": [
     { "source": "/css/:path*", "destination": "/tg-app/css/:path*" },
     { "source": "/js/:path*",  "destination": "/tg-app/js/:path*"  },
