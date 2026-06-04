@@ -957,6 +957,15 @@ const App = {
       slot.addEventListener('animationend', () => slot.classList.remove('sticker-pop'), { once: true });
     });
 
+    // Ежедневник выпрыгивает при входе на экран
+    const bookImg = document.getElementById('gift-book-img');
+    if (bookImg) {
+      bookImg.classList.remove('book-entering', 'book-pressing');
+      void bookImg.offsetWidth;
+      bookImg.classList.add('book-entering');
+      bookImg.addEventListener('animationend', () => bookImg.classList.remove('book-entering'), { once: true });
+    }
+
     // Карточка выпрыгивает при открытии экрана
     setTimeout(() => {
       const cardEl = document.querySelector('#screen-gift .gift-card');
@@ -966,6 +975,37 @@ const App = {
       cardEl.classList.add('card-entrance');
       cardEl.addEventListener('animationend', () => cardEl.classList.remove('card-entrance'), { once: true });
     }, 60);
+  },
+
+  _bookTap(e) {
+    Haptic.light();
+    const img = document.getElementById('gift-book-img');
+    if (!img) return;
+    img.classList.remove('book-pressing');
+    void img.offsetWidth;
+    img.classList.add('book-pressing');
+    img.addEventListener('animationend', () => img.classList.remove('book-pressing'), { once: true });
+
+    const wrap = document.getElementById('gift-book-wrap');
+    if (!wrap) return;
+    const wrapRect = wrap.getBoundingClientRect();
+    const cx = (e.touches ? e.touches[0].clientX : e.clientX) - wrapRect.left;
+    const centerPct = Math.max(10, Math.min(90, (cx / wrapRect.width) * 100));
+
+    const HEARTS = ['❤️', '🧡', '💛', '💗', '🩷'];
+    for (let i = 0; i < 4; i++) {
+      const h = document.createElement('span');
+      h.className = 'gift-heart';
+      h.textContent = HEARTS[Math.floor(Math.random() * HEARTS.length)];
+      const x   = Math.max(5, Math.min(92, centerPct + (-22 + Math.random() * 44)));
+      const sz  = 20 + Math.floor(Math.random() * 14);
+      const rot = -28 + Math.random() * 56;
+      const dur = 820 + Math.floor(Math.random() * 320);
+      const del = i * 85;
+      h.style.cssText = `left:${x}%;bottom:60%;--hr:${rot}deg;--hs:${sz}px;--hd:${dur}ms;animation-delay:${del}ms;`;
+      wrap.appendChild(h);
+      setTimeout(() => h.remove(), dur + del + 120);
+    }
   },
 
   // ════════════════════════════════════════════════════════════════
