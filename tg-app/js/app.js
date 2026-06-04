@@ -653,66 +653,68 @@ const App = {
     }
   },
 
-  _submit() {
+  async _submit() {
     const phone = document.getElementById('input-phone').value.trim();
     if (!phone || phone.replace(/\D/g, '').length < 10) {
       document.getElementById('input-phone').classList.add('err');
       toast('Введи корректный номер телефона'); Haptic.error(); return;
     }
 
-    // Собираем данные заказа
-    const name    = document.getElementById('input-name').value.trim();
-    const address = document.getElementById('input-address').value.trim();
-    const orderNo = '#' + (1000 + Math.floor(Math.random() * 9000));
+    const name = document.getElementById('input-name').value.trim();
 
-    const itemsText = Cart.items
-      .map(i => `  • ${i.name} × ${i.qty} = ${fmt(i.price * i.qty)}`)
-      .join('\n');
+    // Блокируем повторный сабмит
+    _setMain(null, null);
+    toast('Создаём заказ...');
 
-    // Телеграм-юзер из initData (если есть)
-    let buyerInfo = '';
-    if (tg?.initDataUnsafe?.user) {
-      const u = tg.initDataUnsafe.user;
-      buyerInfo = `\nПокупатель: ${[u.first_name, u.last_name].filter(Boolean).join(' ')}`;
-      if (u.username) buyerInfo += ` (@${u.username})`;
-    }
+    try {
+      const items = Cart.items.map(i => ({
+        id:    i.id,
+        name:  i.name,
+        qty:   i.qty,
+        price: i.price,
+      }));
 
-    const message =
-      `🛒 Новый заказ ${orderNo}\n` +
-      `━━━━━━━━━━━━━━━━━━\n` +
-      `${itemsText}\n` +
-      `━━━━━━━━━━━━━━━━━━\n` +
-      `💰 Итого: ${fmt(Cart.total)}\n\n` +
-      `👤 Получатель: ${name}` +
-      `${buyerInfo}\n` +
-      `📍 Адрес: ${address}\n` +
-      `📞 Телефон: ${phone}`;
-
-    // Отправляем уведомление через Telegram Bot API
-    const token  = (typeof CONFIG !== 'undefined') ? CONFIG.BOT_TOKEN     : null;
-    const chatId = (typeof CONFIG !== 'undefined') ? CONFIG.OWNER_CHAT_ID : null;
-
-    if (token && chatId && !token.startsWith('ВСТАВЬ')) {
-      fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+      const res = await fetch('/api/orders', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ chat_id: chatId, text: message }),
-      }).catch(() => {
-        // Не прерываем пользовательский флоу при ошибке сети
-        console.warn('Не удалось отправить уведомление боту');
+        body: JSON.stringify({
+          initData:       tg?.initData || '',
+          recipient_name: name,
+          items,
+          total_rub:      Cart.total,
+        }),
       });
-    } else {
-      // CONFIG не заполнен — просто логируем (для разработки)
-      console.log('ORDER:', message);
+
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.error || 'Ошибка сервера');
+      }
+
+      const { order_no, invoice_link } = await res.json();
+      this._pendingOrderNo = order_no;
+
+      // Открываем платёжный интерфейс Telegram
+      tg.openInvoice(invoice_link, (status) => {
+        if (status === 'paid') {
+          const totalSets = Cart.items.reduce((s, i) => s + i.qty, 0);
+          this._addGiftProgress(totalSets);
+          this.navigate('success');
+        } else if (status === 'cancelled') {
+          _setMain(`Оплатить — ${fmt(Cart.total)}`, () => this._submit(), '#27AE60');
+          toast('Оплата отменена');
+        } else {
+          _setMain(`Оплатить — ${fmt(Cart.total)}`, () => this._submit(), '#27AE60');
+          toast('Что-то пошло не так, попробуй ещё раз');
+          Haptic.error();
+        }
+      });
+
+    } catch (err) {
+      console.error('Submit error:', err.message);
+      _setMain(`Оплатить — ${fmt(Cart.total)}`, () => this._submit(), '#27AE60');
+      toast('Ошибка: ' + err.message);
+      Haptic.error();
     }
-
-    // Сохраняем прогресс программы лояльности
-    const totalSets = Cart.items.reduce((s, i) => s + i.qty, 0);
-    this._addGiftProgress(totalSets);
-
-    // Передаём номер заказа на экран успеха
-    this._pendingOrderNo = orderNo;
-    this.navigate('success');
   },
 
   // ── Успех ──────────────────────────────────────────────────────
