@@ -301,11 +301,35 @@ const App = {
       `<div class="section-label">🔒 Другие сезоны</div>
        <div class="product-grid">${otherSeasons.map(p => this._cardHTML(p)).join('')}</div>`;
 
-    // Стаггер-появление: каждая карточка вылетает с задержкой 30ms
+    // Стаггер-появление: первые 6 карточек вылетают сразу, остальные — при скролле
+    if (this._catalogObserver) {
+      this._catalogObserver.disconnect();
+      this._catalogObserver = null;
+    }
+
     body.querySelectorAll('.product-card').forEach((card, i) => {
-      card.style.setProperty('--card-delay', (i * 30) + 'ms');
-      card.classList.add('card-fresh');
-      card.addEventListener('animationend', () => card.classList.remove('card-fresh'), { once: true });
+      if (i < 6) {
+        card.style.setProperty('--card-delay', (i * 30) + 'ms');
+        card.classList.add('card-fresh');
+        card.addEventListener('animationend', () => card.classList.remove('card-fresh'), { once: true });
+      } else {
+        card.classList.add('card-offscreen');
+      }
+    });
+
+    this._catalogObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (!entry.isIntersecting) return;
+        const card = entry.target;
+        card.classList.remove('card-offscreen');
+        card.classList.add('card-scroll-in');
+        card.addEventListener('animationend', () => card.classList.remove('card-scroll-in'), { once: true });
+        this._catalogObserver.unobserve(card);
+      });
+    }, { threshold: 0.08 });
+
+    body.querySelectorAll('.product-card.card-offscreen').forEach(card => {
+      this._catalogObserver.observe(card);
     });
 
     // Навесить события
@@ -879,6 +903,21 @@ const App = {
   },
 
   _renderGift() {
+    const STICKER_ICONS = ['✏️', '✏️', '🌟', '🩷', '✨', '💛', '🌸', '🦋', '🎀', '🌺'];
+    const STICKER_ROTS  = [-4, 3, -3, 5, -2, 4, -5, 2, -4, 3];
+    const STICKER_BG    = [
+      'linear-gradient(135deg,#7B61FF,#B5C7FF)',
+      'linear-gradient(135deg,#7B61FF,#B5C7FF)',
+      'linear-gradient(135deg,#FF7B42,#FFD060)',
+      'linear-gradient(135deg,#FF85A1,#FF5E8A)',
+      'linear-gradient(135deg,#52B788,#A8D8A8)',
+      'linear-gradient(135deg,#FFD060,#FF7B42)',
+      'linear-gradient(135deg,#7BD4FF,#2AABEE)',
+      'linear-gradient(135deg,#FF7B42,#FF85A1)',
+      'linear-gradient(135deg,#B5C7FF,#7B61FF)',
+      'linear-gradient(135deg,#A8D8A8,#52B788)',
+    ];
+
     const prog     = this._getGiftProgress();
     const unlocked = prog >= 10;
 
@@ -890,9 +929,11 @@ const App = {
       const isPre    = i < 2;
       const isBought = !isPre && i < prog;
       const filled   = isPre || isBought;
-      return `<div class="gift-slot${filled ? ' filled' : ''}${isPre ? ' filled--pre' : ''}">
-        ${isPre ? '⭐' : (isBought ? '✓' : '')}
-      </div>`;
+      const rot      = STICKER_ROTS[i];
+      const bg       = STICKER_BG[i];
+      const icon     = filled ? STICKER_ICONS[i] : '';
+      const style    = filled ? `style="--sticker-rot:${rot}deg;--sticker-bg:${bg}"` : '';
+      return `<div class="gift-slot${filled ? ' filled' : ''}" ${style}>${icon}</div>`;
     }).join('');
 
     document.getElementById('gift-progress-fill').style.width = (prog / 10 * 100) + '%';
@@ -909,11 +950,22 @@ const App = {
       textEl.style.fontWeight = '';
     }
 
+    // Наклейки приклеиваются поочерёдно с задержкой
     slotsEl.querySelectorAll('.gift-slot.filled').forEach((slot, i) => {
-      slot.style.setProperty('--slot-delay', (i * 55) + 'ms');
-      slot.classList.add('slot-pop');
-      slot.addEventListener('animationend', () => slot.classList.remove('slot-pop'), { once: true });
+      slot.style.setProperty('--slot-delay', (150 + i * 75) + 'ms');
+      slot.classList.add('sticker-pop');
+      slot.addEventListener('animationend', () => slot.classList.remove('sticker-pop'), { once: true });
     });
+
+    // Карточка выпрыгивает при открытии экрана
+    setTimeout(() => {
+      const cardEl = document.querySelector('#screen-gift .gift-card');
+      if (!cardEl) return;
+      cardEl.classList.remove('card-entrance');
+      void cardEl.offsetWidth;
+      cardEl.classList.add('card-entrance');
+      cardEl.addEventListener('animationend', () => cardEl.classList.remove('card-entrance'), { once: true });
+    }, 60);
   },
 
   // ════════════════════════════════════════════════════════════════
