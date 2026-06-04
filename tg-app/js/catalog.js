@@ -1,6 +1,6 @@
 // catalog.js — данные каталога Pro-Marker
 // Чтобы добавить/изменить товар — редактируй объекты в CATALOG ниже.
-// Фотографии лежат в папке ../photos/ относительно index.html.
+// Фотографии лежат в папке photos/ относительно index.html.
 
 // ── Названия сезонов для отображения ──────────────────────────────────────
 const SEASON = {
@@ -60,31 +60,31 @@ const CATALOG = {
 
     // 6 наборов в постоянном каталоге
     regular: [
-      { id: 'h-r-1', name: 'Пастельный рассвет',   image: '../photos/IMG_8384.PNG', badge: 'hot' },
-      { id: 'h-r-2', name: 'Нежный иней',           image: '../photos/IMG_8385.PNG' },
-      { id: 'h-r-3', name: 'Ботанический этюд',     image: '../photos/IMG_8386.PNG', badge: 'week' },
-      { id: 'h-r-4', name: 'Акварельный этюд',      image: '../photos/IMG_8387.PNG' },
-      { id: 'h-r-5', name: 'Розовый туман',         image: '../photos/IMG_8388.PNG' },
-      { id: 'h-r-6', name: 'Лавандовые сны',        image: '../photos/IMG_8389.PNG' },
+      { id: 'h-r-1', name: 'Пастельный рассвет',   image: 'photos/IMG_8384.PNG', badge: 'hot' },
+      { id: 'h-r-2', name: 'Нежный иней',           image: 'photos/IMG_8385.PNG' },
+      { id: 'h-r-3', name: 'Ботанический этюд',     image: 'photos/IMG_8386.PNG', badge: 'week' },
+      { id: 'h-r-4', name: 'Акварельный этюд',      image: 'photos/IMG_8387.PNG' },
+      { id: 'h-r-5', name: 'Розовый туман',         image: 'photos/IMG_8388.PNG' },
+      { id: 'h-r-6', name: 'Лавандовые сны',        image: 'photos/IMG_8389.PNG' },
     ],
 
     // 8 сезонных наборов (по 2 на сезон)
     seasonal: {
       summer: [
-        { id: 'h-s-su1', name: 'Летний бриз',      image: '../photos/IMG_8391.PNG' },
-        { id: 'h-s-su2', name: 'Тропический закат', image: '../photos/IMG_8392.PNG' },
+        { id: 'h-s-su1', name: 'Летний бриз',      image: 'photos/IMG_8391.PNG' },
+        { id: 'h-s-su2', name: 'Тропический закат', image: 'photos/IMG_8392.PNG' },
       ],
       autumn: [
-        { id: 'h-s-au1', name: 'Золотая осень',    image: '../photos/IMG_8393.PNG' },
-        { id: 'h-s-au2', name: 'Янтарный дождь',   image: '../photos/IMG_8394.PNG' },
+        { id: 'h-s-au1', name: 'Золотая осень',    image: 'photos/IMG_8393.PNG' },
+        { id: 'h-s-au2', name: 'Янтарный дождь',   image: 'photos/IMG_8394.PNG' },
       ],
       winter: [
-        { id: 'h-s-wi1', name: 'Морозный узор',    image: '../photos/IMG_8395.PNG' },
-        { id: 'h-s-wi2', name: 'Зимний вечер',     image: '../photos/IMG_8396.PNG' },
+        { id: 'h-s-wi1', name: 'Морозный узор',    image: 'photos/IMG_8395.PNG' },
+        { id: 'h-s-wi2', name: 'Зимний вечер',     image: 'photos/IMG_8396.PNG' },
       ],
       spring: [
-        { id: 'h-s-sp1', name: 'Весенний сад',     image: '../photos/IMG_8397.PNG' },
-        { id: 'h-s-sp2', name: 'Сакурный цвет',    image: '../photos/IMG_8398.PNG' },
+        { id: 'h-s-sp1', name: 'Весенний сад',     image: 'photos/IMG_8397.PNG' },
+        { id: 'h-s-sp2', name: 'Сакурный цвет',    image: 'photos/IMG_8398.PNG' },
       ],
     },
   },
@@ -96,30 +96,30 @@ const CATALOG = {
     price: 470,
 
     regular: [
-      { id: 's-r-1', name: 'Акварельный сад',   image: '../photos/IMG_8403.PNG', badge: 'hot' },
-      { id: 's-r-2', name: 'Пастельные мечты',  image: '../photos/IMG_8404.PNG' },
-      { id: 's-r-3', name: 'Лавандовый бриз',   image: '../photos/IMG_8405.PNG', badge: 'week' },
-      { id: 's-r-4', name: 'Нежный персик',     image: '../photos/IMG_8406.PNG' },
-      { id: 's-r-5', name: 'Мятный свежий',     image: '../photos/IMG_8407.PNG' },
-      { id: 's-r-6', name: 'Ванильное небо',    image: '../photos/IMG_8408.PNG' },
+      { id: 's-r-1', name: 'Акварельный сад',   image: 'photos/IMG_8403.PNG', badge: 'hot' },
+      { id: 's-r-2', name: 'Пастельные мечты',  image: 'photos/IMG_8404.PNG' },
+      { id: 's-r-3', name: 'Лавандовый бриз',   image: 'photos/IMG_8405.PNG', badge: 'week' },
+      { id: 's-r-4', name: 'Нежный персик',     image: 'photos/IMG_8406.PNG' },
+      { id: 's-r-5', name: 'Мятный свежий',     image: 'photos/IMG_8407.PNG' },
+      { id: 's-r-6', name: 'Ванильное небо',    image: 'photos/IMG_8408.PNG' },
     ],
 
     seasonal: {
       summer: [
-        { id: 's-s-su1', name: 'Морской горизонт', image: '../photos/IMG_8409.PNG' },
-        { id: 's-s-su2', name: 'Солнечный полдень', image: '../photos/IMG_8410.PNG' },
+        { id: 's-s-su1', name: 'Морской горизонт', image: 'photos/IMG_8409.PNG' },
+        { id: 's-s-su2', name: 'Солнечный полдень', image: 'photos/IMG_8410.PNG' },
       ],
       autumn: [
-        { id: 's-s-au1', name: 'Кленовый листопад', image: '../photos/IMG_8411.PNG' },
-        { id: 's-s-au2', name: 'Тыквенный уют',     image: '../photos/IMG_8412.PNG' },
+        { id: 's-s-au1', name: 'Кленовый листопад', image: 'photos/IMG_8411.PNG' },
+        { id: 's-s-au2', name: 'Тыквенный уют',     image: 'photos/IMG_8412.PNG' },
       ],
       winter: [
-        { id: 's-s-wi1', name: 'Снежный вечер',    image: '../photos/IMG_8413.PNG' },
-        { id: 's-s-wi2', name: 'Новогодний иней',  image: '../photos/IMG_8414.PNG' },
+        { id: 's-s-wi1', name: 'Снежный вечер',    image: 'photos/IMG_8413.PNG' },
+        { id: 's-s-wi2', name: 'Новогодний иней',  image: 'photos/IMG_8414.PNG' },
       ],
       spring: [
-        { id: 's-s-sp1', name: 'Цветение вишни',  image: '../photos/IMG_8415.PNG' },
-        { id: 's-s-sp2', name: 'Весенний луг',    image: '../photos/IMG_8416.PNG' },
+        { id: 's-s-sp1', name: 'Цветение вишни',  image: 'photos/IMG_8415.PNG' },
+        { id: 's-s-sp2', name: 'Весенний луг',    image: 'photos/IMG_8416.PNG' },
       ],
     },
   },
